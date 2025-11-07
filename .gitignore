@@ -1,0 +1,12 @@
+# Archivo de configuración con contraseñas y claves API
+config.php
+
+# Archivos de exportación de Base de Datos
+*.sql
+
+# Archivos del sistema operativo de Mac y Windows
+.DS_Store
+Thumbs.db
+
+# Carpetas de dependencias (por si acaso usamos composer en el futuro)
+/vendor/
