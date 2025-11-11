@@ -101,6 +101,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portal Megared</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -340,7 +342,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <form action="index.php" method="POST">
                 <img src="imagen/megared-logo.png" alt="Logo Megared" class="logo-megared">
 
-                <h1>Crear Cuenta</h1>
+                <h1 data-aos="fade-down">Crear Cuenta</h1>
                 
                 <?php if (!empty($mensaje_registro)): ?>
                     <p class="mensaje <?php echo (strpos($mensaje_registro, 'Error') !== false) ? 'error' : 'exito'; ?>">
@@ -348,19 +350,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     </p>
                 <?php endif; ?>
                 
-                <div>
+                <div data-aos="fade-left">
                     <label for="reg_nombre">Nombres</label>
                     <input type="text" id="reg_nombre" name="nombre" required placeholder="Escribe tus nombres"/>
                 </div>
-                <div>
+                <div data-aos="fade-left">
                     <label for="reg_apellidos">Apellidos</label>
                     <input type="text" id="reg_apellidos" name="apellidos" required placeholder="Escribe tus apellidos"/>
                 </div>
-                <div>
+                <div data-aos="fade-left">
                     <label for="reg_cedula">Cédula</label>
                     <input type="text" id="reg_cedula" name="cedula" required placeholder="Tu número de cédula"/>
                 </div>
-                <div>
+                <div data-aos="fade-left">
                     <label for="reg_genero">Género</label>
                     <select id="reg_genero" name="genero" required>
                         <option value="">-- Seleccione --</option>
@@ -369,15 +371,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         <option value="Otro">Otro</option>
                     </select>
                 </div>
-                <div>
+                <div data-aos="fade-left">
                     <label for="reg_correo">Correo</label>
                     <input type="email" id="reg_correo" name="correo" required placeholder="ejemplo@correo.com"/>
                 </div>
-                <div>
+                <div data-aos="fade-left">
                     <label for="reg_pass">Contraseña</label>
                     <input type="password" id="reg_pass" name="contrasena" required placeholder="Crea una contraseña segura"/>
                 </div>
-                <div>
+                <div data-aos="fade-left">
                     <label for="reg_captcha">Código Captcha</label>
                     <div class="captcha-box">
                         <span class="captcha-img"><?php echo $_SESSION['captcha_code']; ?></span>
@@ -393,17 +395,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <form action="index.php" method="POST">
                 <img src="imagen/megared-logo.png" alt="Logo Megared" class="logo-megared">        
                     
-                <h1>Iniciar Sesión</h1>
+                <h1 data-aos="fade-down">Iniciar Sesión</h1>
                 
                 <?php if (!empty($mensaje_login)): ?>
                     <p class="mensaje error"><?php echo $mensaje_login; ?></p>
                 <?php endif; ?>
                 
-                <div>
+                <div data-aos="fade-right" data-aos-delay="100">
                     <label for="log_correo">Correo</albel>
                     <input type="email" id="log_correo" name="correo" required placeholder="ejemplo@correo.com"/>
                 </div>
-                <div>
+                <div data-aos="fade-right" data-aos-delay="200">
                     <label for="log_pass">Contraseña</label>
                     <input type="password" id="log_pass" name="contrasena" required placeholder="Escribe tu contraseña"/>
                 </div>
@@ -415,13 +417,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <div class="overlay-container">
             <div class="overlay">
                 <div class="overlay-panel overlay-left">
-                    <h1>¡Bienvenido de Nuevo!</h1>
-                    <p>Para mantenerte conectado, inicia sesión con tu cuenta.</p>
+                    <h1 data-aos="fade-zoom-in">¡Bienvenido de Nuevo!</h1>
+                    <p data-aos="fade-zoom-in" data-aos-delay="100">Para mantenerte conectado, inicia sesión con tu cuenta.</p>
                     <button class="ghost" id="signIn">Iniciar Sesión</button>
                 </div>
                 <div class="overlay-panel overlay-right">
-                    <h1>¡Bienvenido a tu portal MEGAred!</h1>
-                    <p>Ingresa tus datos personales.</p>
+                    <h1 data-aos="fade-zoom-in">¡Bienvenido a tu portal MEGAred!</h1>
+                    <p data-aos="fade-zoom-in" data-aos-delay="100">Ingresa tus datos personales.</p>
                     <button class="ghost" id="signUp">Registrarse</button>
                 </div>
             </div>
@@ -429,7 +431,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     </div>
 
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
     <script>
+            AOS.init();
+
         const signUpButton = document.getElementById('signUp');
         const signInButton = document.getElementById('signIn');
         const container = document.getElementById('container');
