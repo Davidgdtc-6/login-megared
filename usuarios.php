@@ -306,6 +306,7 @@ $nombre_completo = htmlspecialchars($nombre_usuario . " " . $apellidos_usuario);
             <nav class="sidebar-nav">
                 <ul>
                     <li><a href="dashboard.php"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                    
                     <li><a href="#"><i class="fas fa-list"></i> Lista de entradas</a></li>
                     <li><a href="#"><i class="fas fa-comments"></i> Mapa</a></li>
                     <li><a href="#"><i class="fas fa-calendar-alt"></i> Calendario</a></li>
@@ -314,13 +315,15 @@ $nombre_completo = htmlspecialchars($nombre_usuario . " " . $apellidos_usuario);
                 </ul>
             </nav>
             <div class="sidebar-footer">
-            <div class="user-profile">
-                <i class="fas fa-user-circle user-icon"></i> <span><?php echo $nombre_completo; ?></span>
-            </div>
-            
+
+            <i class="fas fa-user-circle user-icon-footer"></i> 
+
+            <span class="user-name-footer"><?php echo $nombre_completo; ?></span>
+
             <a href="logout.php" class="logout-button" title="Cerrar Sesión">
                 <i class="fas fa-sign-out-alt"></i>
             </a>
+
         </div>
         </aside>
 
@@ -344,7 +347,7 @@ $nombre_completo = htmlspecialchars($nombre_usuario . " " . $apellidos_usuario);
                 $result = $conn->query($sql);
                 $usuarios = [];
 
-                if ($result->num_rows > 0) {
+                if ($result && $result->num_rows > 0) {
                     $usuarios = $result->fetch_all(MYSQLI_ASSOC);
                 }
                 $conn->close();

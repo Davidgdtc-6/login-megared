@@ -10,7 +10,18 @@ if (!isset($_SESSION['usuario_id'])) {
 $nombre_usuario = $_SESSION['usuario_nombre'];
 $apellidos_usuario = $_SESSION['usuario_apellidos'];
 $nombre_completo = htmlspecialchars($nombre_usuario . " " . $apellidos_usuario);
+require_once 'db-connect.php'; 
 
+$sql_ultimos_usuarios = "SELECT nombre, apellidos, correo FROM usuarios ORDER BY id DESC LIMIT 3";
+$result_usuarios = $conn->query($sql_ultimos_usuarios);
+$ultimos_usuarios = []; 
+
+
+if ($result_usuarios && $result_usuarios->num_rows > 0) {
+    $ultimos_usuarios = $result_usuarios->fetch_all(MYSQLI_ASSOC);
+}
+
+$conn->close();
 ?>
 
 <!DOCTYPE html>
@@ -293,6 +304,55 @@ $nombre_completo = htmlspecialchars($nombre_usuario . " " . $apellidos_usuario);
             border-bottom: none;
         }
 
+        .latest-users-list {
+            display: flex;
+            flex-direction: column; 
+            gap: 10px; 
+            height: 200px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .user-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .user-item:last-child {
+            border-bottom: none;
+        }
+
+        .user-icon-small {
+            font-size: 1.8rem;
+            color: #888;
+            flex-shrink: 0;
+        }
+
+        .user-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-details strong {
+            font-weight: 500;
+            color: #333;
+            font-size: 0.95rem;
+        }
+
+        .user-details span {
+            font-size: 0.85rem;
+            color: #777;
+        }
+
+        .no-users {
+            color: #999;
+            padding: 2rem;
+            text-align: center;
+        }
+
     </style>
 </head>
 <body>
@@ -305,19 +365,22 @@ $nombre_completo = htmlspecialchars($nombre_usuario . " " . $apellidos_usuario);
             </div>
             <nav class="sidebar-nav">
                 <ul>
-                    <li><a href="dashboard.php"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-                    <li><a href="#"><i class="fas fa-list"></i> Lista de entradas</a></li>
-                    <li><a href="#"><i class="fas fa-comments"></i> Mapa</a></li>
-                    <li><a href="#"><i class="fas fa-calendar-alt"></i> Calendario</a></li>
+                    <li class="active"><a href="dashboard.php"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
                     
-                    <li class="active"><a href="usuarios.php"><i class="fas fa-users"></i> Ver Usuarios</a></li>
+                    <li><a href="#"><i class="fas fa-list"></i> Lista de entradas</a></li>
+                    <li><a href="#"><i class="fas fa-map-marker-alt"></i> Mapa</a></li>
+                    <li><a href="#"><i class="fas fa-calendar-alt"></i> Calendario</a></li>
+
+                    <li><a href="usuarios.php"><i class="fas fa-users"></i> Ver Usuarios</a></li>
                 </ul>
             </nav>
+
             <div class="sidebar-footer">
-            <div class="user-profile">
-                <i class="fas fa-user-circle user-icon"></i> <span><?php echo $nombre_completo; ?></span>
-            </div>
-            
+
+            <i class="fas fa-user-circle user-icon-footer"></i> 
+
+            <span class="user-name-footer"><?php echo $nombre_completo; ?></span>
+
             <a href="logout.php" class="logout-button" title="Cerrar Sesión">
                 <i class="fas fa-sign-out-alt"></i>
             </a>
@@ -334,54 +397,58 @@ $nombre_completo = htmlspecialchars($nombre_usuario . " " . $apellidos_usuario);
             </header>
 
             <section class="content-body">
-                <h2 data-aos="fade-down">Lista de usuarios</h2>
+                <h2 data-aos="fade-down">¡Buenos días, <?php echo htmlspecialchars($nombre_usuario); ?>!</h2>
 
-                <?php
-                require_once 'db-connect.php';
+                <div class="stats-cards">
+                    <div class="card" data-aos="fade-up" data-aos-delay="100">
+                        <h3>Nuevos clientes</h3>
+                        <p>300</p>
+                        <span>+18.33%</span>
+                    </div>
+                    <div class="card" data-aos="fade-up" data-aos-delay="200">
+                        <h3>Ganancias</h3>
+                        <p>$18,306</p>
+                        <span>+ info</span>
+                    </div>
+                    <div class="card" data-aos="fade-up" data-aos-delay="300">
+                        <h3>Soportes</h3>
+                        <p>1538</p>
+                        <span>-1.33%</span>
+                    </div>
+                    <div class="card" data-aos="fade-up" data-aos-delay="400">
+                        <h3>Proyectos</h3>
+                        <p>864</p>
+                        <span>+ info</span>
+                    </div>
+                </div>
 
-                $sql = "SELECT id, nombre, apellidos, correo, cedula, genero, fecha_registro FROM usuarios ORDER BY fecha_registro DESC";
-
-                $result = $conn->query($sql);
-                $usuarios = [];
-
-                if ($result->num_rows > 0) {
-                    $usuarios = $result->fetch_all(MYSQLI_ASSOC);
-                }
-                $conn->close();
-
-                ?>
-
-                <div class="user-table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Nombre</th>
-                                <th>Apellidos</th>
-                                <th>Correo Electrónico</th>
-                                <th>Cédula</th>
-                                <th>Género</th>
-                                <th>Fecha de Registro</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php if (empty($usuarios)): ?>
-                                <tr>
-                                    <td colspan="6">No hay usuarios registrados.</td>
-                                </tr>
+                <div class="chart-cards">
+                    <div class="card-large" data-aos="zoom-in" data-aos-delay="500">
+                        <h3>Últimos Usuarios Registrados</h3>
+                        <div class="latest-users-list">
+                            <?php if (empty($ultimos_usuarios)): ?>
+                                <p class="no-users">No hay usuarios registrados.</p>
                             <?php else: ?>
-                                <?php foreach ($usuarios as $usuario): ?>
-                                    <tr>
-                                        <td><?php echo htmlspecialchars($usuario['nombre']); ?></td>
-                                        <td><?php echo htmlspecialchars($usuario['apellidos']); ?></td>
-                                        <td><?php echo htmlspecialchars($usuario['correo']); ?></td>
-                                        <td><?php echo htmlspecialchars($usuario['cedula']); ?></td>
-                                        <td><?php echo htmlspecialchars($usuario['genero']); ?></td>
-                                        <td><?php echo date('d/m/Y H:i', strtotime($usuario['fecha_registro'])); ?></td>
-                                    </tr>
+                                <?php foreach ($ultimos_usuarios as $usuario): ?>
+                                    <div class="user-item">
+                                        <i class="fas fa-user-circle user-icon-small"></i>
+                                        <div class="user-details">
+                                            <strong><?php echo htmlspecialchars($usuario['nombre'] . ' ' . $usuario['apellidos']); ?></strong>
+                                            <span><?php echo htmlspecialchars($usuario['correo']); ?></span>
+                                        </div>
+                                    </div>
                                 <?php endforeach; ?>
                             <?php endif; ?>
-                        </tbody>
-                    </table>
+                        </div>
+                        <a href="usuarios.php" class="card-footer-link">Ver todos los usuarios &rarr;</a>
+                    </div>
+
+                    <div class="card-large" data-aos="zoom-in" data-aos-delay="600">
+                        <h3>Tu Ubicación Actual</h3>
+                        <div class="map-container">
+                            <div id="map"></div> 
+                        </div>
+                    </div>
                 </div>
 
             </section>
