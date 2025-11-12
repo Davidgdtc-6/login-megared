@@ -330,11 +330,47 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             height: auto;
             margin-bottom: 1rem;
             align-self: center; 
-}
+        }
+
+        .preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: #ffffff;
+            z-index: 9999;
+            display: grid;
+            place-items: center;
+            transition: opacity 0.5s ease;
+        }
+
+        .preloader.fade-out {
+            opacity: 0;
+        }
+
+        .preloader .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f0f0f0;
+            border-top-color: #009900;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
 
     </style>
 </head>
 <body>
+
+    <div class="preloader" id="preloader">
+        <div class="spinner"></div>
+    </div>
 
     <div class="container" id="container">
 
@@ -392,6 +428,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </div>
 
         <div class="form-container sign-in-container">
+            <form action="index.php" method="POST" id="login-form">
+                </form>
+        </div>
+
+        <div class="form-container sign-in-container">
             <form action="index.php" method="POST">
                 <img src="imagen/megared-logo.png" alt="Logo Megared" class="logo-megared">        
                     
@@ -434,11 +475,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 
     <script>
-            AOS.init();
+        AOS.init(); 
 
+        const preloader = document.getElementById('preloader');
+        const loginForm = document.getElementById('login-form');
         const signUpButton = document.getElementById('signUp');
         const signInButton = document.getElementById('signIn');
         const container = document.getElementById('container');
+
+        window.addEventListener('load', () => {
+            preloader.classList.add('fade-out');
+            setTimeout(() => {
+                preloader.style.display = 'none';
+            }, 500);
+        });
+
+        if(loginForm) {
+            loginForm.addEventListener('submit', function() {
+                preloader.style.display = 'grid';
+                preloader.classList.remove('fade-out');
+            });
+        }
 
         signUpButton.addEventListener('click', () => {
             container.classList.add('right-panel-active');
@@ -449,7 +506,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         });
 
         <?php
-
         if (!empty($mensaje_registro)) {
             echo "container.classList.add('right-panel-active');";
         }

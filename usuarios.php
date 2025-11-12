@@ -72,13 +72,14 @@ $nombre_completo = htmlspecialchars($nombre_usuario . " " . $apellidos_usuario);
             color: #111;
         }
 
+        .sidebar-nav li.active a:hover {
+            color: #fff;
+        }
+
         .sidebar-nav li.active a {
             background-color: #009900;
             color: #fff;
             font-weight: 600;
-        }
-        .sidebar-nav li.active a i {
-            color: #fff;
         }
 
         .sidebar-nav li a {
@@ -89,11 +90,10 @@ $nombre_completo = htmlspecialchars($nombre_usuario . " " . $apellidos_usuario);
             align-items: center;
             padding: 0.85rem 1.25rem;
             border-radius: 8px;
-            transition: background-color 0.2s, color 0.2s;
         }
 
-        .sidebar-nav li a:hover i {
-            color: #111;
+        .sidebar-nav li.active a i {
+            color: #fff;
         }
 
         .sidebar-nav li i {
@@ -307,8 +307,8 @@ $nombre_completo = htmlspecialchars($nombre_usuario . " " . $apellidos_usuario);
                 <ul>
                     <li><a href="dashboard.php"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
                     
-                    <li><a href="#"><i class="fas fa-list"></i> Lista de entradas</a></li>
-                    <li><a href="#"><i class="fas fa-comments"></i> Mapa</a></li>
+                    <li><a href="#"><i class="fas fa-tasks"></i> Lista de soportes</a></li>
+                    <li><a href="planes.php"><i class="fas fa-file-invoice-dollar"></i> Planes</a></li>
                     <li><a href="#"><i class="fas fa-calendar-alt"></i> Calendario</a></li>
                     
                     <li class="active"><a href="usuarios.php"><i class="fas fa-users"></i> Ver Usuarios</a></li>

@@ -88,9 +88,6 @@ $conn->close();
             color: #fff;
             font-weight: 600;
         }
-        .sidebar-nav li.active a i {
-            color: #fff;
-        }
 
         .sidebar-nav li a {
             color: #555;
@@ -100,12 +97,15 @@ $conn->close();
             align-items: center;
             padding: 0.85rem 1.25rem;
             border-radius: 8px;
-            transition: background-color 0.2s, color 0.2s;
         }
 
-        .sidebar-nav li a:hover i {
-            color: #111;
+        .sidebar-nav li.active a i {
+            color: #fff;
         }
+
+        .sidebar-nav li.active a:hover {
+            color: #fff;
+        }    
 
         .sidebar-nav li i {
             margin-right: 12px;
@@ -163,11 +163,6 @@ $conn->close();
             font-weight: 600;
         }
 
-        .stats-cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1.5rem;
-        }
         .card {
             background: #fff;
             padding: 1.5rem;
@@ -189,21 +184,35 @@ $conn->close();
             color: #009900;
         }
 
-        .chart-cards {
+        .dashboard-grid-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1.5rem;
-            margin-top: 2rem;
+            grid-template-columns: 1fr 2.5fr; 
+            gap: 1.5rem; 
         }
+
+        .grid-column-left {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .grid-column-right {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
         .card-large {
             background: #fff;
             padding: 1.5rem;
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0,0,0,0.05);
         }
+
         .card-large h3 {
             margin-bottom: 1rem;
         }
+
         .placeholder-chart {
             height: 250px;
             display: grid;
@@ -305,30 +314,36 @@ $conn->close();
         }
 
         .latest-users-list {
-            display: flex;
-            flex-direction: column; 
-            gap: 10px; 
-            height: 200px;
+            height: 200px; 
             overflow-y: auto;
-            padding-right: 10px;
+            padding: 5px;
         }
 
         .user-item {
             display: flex;
             align-items: center;
             gap: 12px;
-            padding: 0.75rem 0;
-            border-bottom: 1px solid #f0f0f0;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            background: #fdfdfd;
+            border: 1px solid #f0f0f0;
+            margin-bottom: 0.5rem;
+            transition: all 0.2s ease-in-out;
         }
 
         .user-item:last-child {
-            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .user-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.07);
+            border-color: #009900;
         }
 
         .user-icon-small {
             font-size: 1.8rem;
             color: #888;
-            flex-shrink: 0;
         }
 
         .user-details {
@@ -339,7 +354,6 @@ $conn->close();
         .user-details strong {
             font-weight: 500;
             color: #333;
-            font-size: 0.95rem;
         }
 
         .user-details span {
@@ -353,9 +367,73 @@ $conn->close();
             text-align: center;
         }
 
+        .preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: #ffffff;
+            z-index: 9999;
+            display: grid;
+            place-items: center;
+            transition: opacity 0.5s ease;
+        }
+
+        .preloader.fade-out {
+            opacity: 0;
+        }
+
+        .preloader .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f0f0f0;
+            border-top-color: #009900;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .card-footer-link {
+            display: block;
+            text-align: right;
+            padding-top: 1rem;
+            margin-top: 0.5rem;
+            font-weight: 500;
+            color: #009900;
+            text-decoration: none;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .card-footer-link:hover {
+            text-decoration: underline;
+        }
+
+        .card {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between; 
+            height: 100%; 
+        }
+
+        .card-image-plans {
+            width: 100%;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+        
+
     </style>
 </head>
 <body>
+    <div class="preloader" id="preloader">
+        <div class="spinner"></div>
+    </div>
 
     <div class="dashboard-container">
 
@@ -367,8 +445,8 @@ $conn->close();
                 <ul>
                     <li class="active"><a href="dashboard.php"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
                     
-                    <li><a href="#"><i class="fas fa-list"></i> Lista de entradas</a></li>
-                    <li><a href="#"><i class="fas fa-map-marker-alt"></i> Mapa</a></li>
+                    <li><a href="#"><i class="fas fa-tasks"></i> Lista de soportes</a></li>
+                    <li><a href="planes.php"><i class="fas fa-file-invoice-dollar"></i> Planes</a></li>
                     <li><a href="#"><i class="fas fa-calendar-alt"></i> Calendario</a></li>
 
                     <li><a href="usuarios.php"><i class="fas fa-users"></i> Ver Usuarios</a></li>
@@ -399,67 +477,89 @@ $conn->close();
             <section class="content-body">
                 <h2 data-aos="fade-down">¡Buenos días, <?php echo htmlspecialchars($nombre_usuario); ?>!</h2>
 
-                <div class="stats-cards">
-                    <div class="card" data-aos="fade-up" data-aos-delay="100">
-                        <h3>Nuevos clientes</h3>
-                        <p>300</p>
-                        <span>+18.33%</span>
-                    </div>
-                    <div class="card" data-aos="fade-up" data-aos-delay="200">
-                        <h3>Ganancias</h3>
-                        <p>$18,306</p>
-                        <span>+ info</span>
-                    </div>
-                    <div class="card" data-aos="fade-up" data-aos-delay="300">
-                        <h3>Soportes</h3>
-                        <p>1538</p>
-                        <span>-1.33%</span>
-                    </div>
-                    <div class="card" data-aos="fade-up" data-aos-delay="400">
-                        <h3>Proyectos</h3>
-                        <p>864</p>
-                        <span>+ info</span>
-                    </div>
-                </div>
+                <div class="dashboard-grid-container">
 
-                <div class="chart-cards">
-                    <div class="card-large" data-aos="zoom-in" data-aos-delay="500">
-                        <h3>Últimos Usuarios Registrados</h3>
-                        <div class="latest-users-list">
-                            <?php if (empty($ultimos_usuarios)): ?>
-                                <p class="no-users">No hay usuarios registrados.</p>
-                            <?php else: ?>
-                                <?php foreach ($ultimos_usuarios as $usuario): ?>
-                                    <div class="user-item">
-                                        <i class="fas fa-user-circle user-icon-small"></i>
-                                        <div class="user-details">
-                                            <strong><?php echo htmlspecialchars($usuario['nombre'] . ' ' . $usuario['apellidos']); ?></strong>
-                                            <span><?php echo htmlspecialchars($usuario['correo']); ?></span>
+                    <div class="grid-column-left">
+                        
+                        <div class="card" data-aos="fade-up" data-aos-delay="100">
+                            <h3>Nuevos clientes</h3>
+                            <p>300</p>
+                            <span>+18.33%</span>
+                        </div>
+                        <div class="card" data-aos="fade-up" data-aos-delay="200">
+                            <h3>Ganancias</h3>
+                            <p>$18,306</p>
+                            <span>+ info</span>
+                        </div>
+                        <div class="card" data-aos="fade-up" data-aos-delay="300">
+                            <h3>Soportes</h3>
+                            <p>1538</p>
+                            <span>-1.33%</span>
+                        </div>
+                        <div class="card" data-aos="fade-up" data-aos-delay="400">
+                            <h3>Proyectos</h3>
+                            <p>864</p>
+                            <span>+ info</span>
+                        </div>
+
+                    </div>
+
+                    <div class="grid-column-right">
+
+                        <div class="card-large" data-aos="zoom-in" data-aos-delay="500">
+                            <h3>Últimos Usuarios Registrados</h3>
+                            <div class="latest-users-list">
+                                <?php if (empty($ultimos_usuarios)): ?>
+                                    <p class="no-users">No hay usuarios registrados.</p>
+                                <?php else: ?>
+                                    <?php foreach ($ultimos_usuarios as $usuario): ?>
+                                        <div class="user-item">
+                                            <i class="fas fa-user-circle user-icon-small"></i>
+                                            <div class="user-details">
+                                                <strong><?php echo htmlspecialchars($usuario['nombre'] . ' ' . $usuario['apellidos']); ?></strong>
+                                                <span><?php echo htmlspecialchars($usuario['correo']); ?></span>
+                                            </div>
                                         </div>
-                                    </div>
-                                <?php endforeach; ?>
-                            <?php endif; ?>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+                            </div>
+                            <a href="usuarios.php" class="card-footer-link">Ver todos los usuarios &rarr;</a>
                         </div>
-                        <a href="usuarios.php" class="card-footer-link">Ver todos los usuarios &rarr;</a>
-                    </div>
 
-                    <div class="card-large" data-aos="zoom-in" data-aos-delay="600">
-                        <h3>Tu Ubicación Actual</h3>
-                        <div class="map-container">
-                            <div id="map"></div> 
+                        <div class="card-large" data-aos="zoom-in" data-aos-delay="600">
+                            <h3> Nuestros Planes</h3>
+                            <a href="planes.php">
+                                <img src="Imagen/planes.png" alt="Imagen de Planes Megared" class="card-image-plans">
+                            </a>
                         </div>
+
                     </div>
+                    
                 </div>
 
             </section>
         </main>
     </div>
-
-    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    
+    <script>
 
-    <script src="js/main.js"></script>
+        const preloader = document.getElementById('preloader');
+        
+        window.addEventListener('load', () => {
+
+            preloader.classList.add('fade-out');
+            setTimeout(() => {
+                preloader.style.display = 'none';
+            }, 500); 
+        });
+
+        AOS.init({
+            duration: 800,
+            once: true
+        });
+
+    </script>
 
 </body>
 </html>
