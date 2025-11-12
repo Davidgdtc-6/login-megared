@@ -10,14 +10,7 @@ if (!isset($_SESSION['usuario_id'])) {
 $nombre_usuario = $_SESSION['usuario_nombre'];
 $apellidos_usuario = $_SESSION['usuario_apellidos'];
 $nombre_completo = htmlspecialchars($nombre_usuario . " " . $apellidos_usuario);
-require_once 'db-connect.php';
 
-$sql_ultimos_usuarios = "SELECT nombre, apellidos, correo FROM usuarios ORDER BY id DESC LIMIT 3";
-$result_usuarios = $conn->query($sql_ultimos_usuarios);
-$ultimos_usuarios = [];
-if ($result_usuarios && $result_usuarios->num_rows > 0) {
-    $ultimos_usuarios = $result_usuarios->fetch_all(MYSQLI_ASSOC);
-}
 ?>
 
 <!DOCTYPE html>
@@ -26,11 +19,8 @@ if ($result_usuarios && $result_usuarios->num_rows > 0) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Megared</title>
-
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhpmA9n5KoSgHnCGtfRCSpG/Jjr5slSjMYRc=" crossorigin=""/>
-
+    
     <style>
         .logo-megared {
             width: 300px;
@@ -263,73 +253,46 @@ if ($result_usuarios && $result_usuarios->num_rows > 0) {
             color: #fff;
         }
 
-        .latest-users-list {
-            height: 200px;
-            overflow-y: auto;
-        }
-        .user-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 0.75rem 0.5rem;
-            border-bottom: 1px solid #f0f0f0;
-        }
-        .user-item:last-child {
-            border-bottom: none;
-        }
-        .user-icon-small {
-            font-size: 1.8rem;
-            color: #888;
-        }
-        .user-details {
-            display: flex;
-            flex-direction: column;
-        }
-        .user-details strong {
-            font-weight: 500;
-            color: #333;
-        }
-        .user-details span {
-            font-size: 0.85rem;
-            color: #777;
-        }
-        .no-users {
-            color: #999;
-            padding: 2rem;
-            text-align: center;
-        }
-        .card-footer-link {
-            display: block;
-            padding-top: 1rem;
-            margin-top: 0.5rem;
-            text-align: right;
-            font-weight: 500;
-            color: #009900;
-            text-decoration: none;
-            border-top: 1px solid #f0f0f0;
-        }
-        .card-footer-link:hover {
-            text-decoration: underline;
-        }
-
-        .map-container {
-            width: 100%;
-            height: 300px;
-            position: relative;
-            border-radius: 4px;
-            overflow: hidden;
-        }
-
-        #map {
-            width: 100%;
-            height: 100%;
-            background-color: #eee;
-            z-index: 1;
-        }
-
         .sidebar-nav {
             flex-grow: 1;
         }
+
+        .user-table-container {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+            overflow: hidden;
+            margin-top: 1.5rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table th {
+            background-color: #f9f9f9;
+            font-weight: 600;
+            color: #555;
+            padding: 1rem;
+            text-align: left;
+        }
+
+        table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #f0f0f0;
+            color: #333;
+        }
+
+        table tr:hover {
+            background-color: #f4f7fa;
+        }
+
+        table tr:last-child td {
+            border-bottom: none;
+        }
+
     </style>
 </head>
 <body>
@@ -342,25 +305,23 @@ if ($result_usuarios && $result_usuarios->num_rows > 0) {
             </div>
             <nav class="sidebar-nav">
                 <ul>
-                    <li class="active"><a href="dashboard.php"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                    <li><a href="dashboard.php"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
                     <li><a href="#"><i class="fas fa-list"></i> Lista de entradas</a></li>
                     <li><a href="#"><i class="fas fa-comments"></i> Mapa</a></li>
                     <li><a href="#"><i class="fas fa-calendar-alt"></i> Calendario</a></li>
                     
-                    <li><a href="usuarios.php"><i class="fas fa-users"></i> Ver Usuarios</a></li>
+                    <li class="active"><a href="usuarios.php"><i class="fas fa-users"></i> Ver Usuarios</a></li>
                 </ul>
             </nav>
             <div class="sidebar-footer">
-
-                <i class="fas fa-user-circle user-icon-footer"></i> 
-
-                <span class="user-name-footer"><?php echo $nombre_completo; ?></span>
-
-                <a href="logout.php" class="logout-button" title="Cerrar Sesión">
-                    <i class="fas fa-sign-out-alt"></i>
-                </a>
-
+            <div class="user-profile">
+                <i class="fas fa-user-circle user-icon"></i> <span><?php echo $nombre_completo; ?></span>
             </div>
+            
+            <a href="logout.php" class="logout-button" title="Cerrar Sesión">
+                <i class="fas fa-sign-out-alt"></i>
+            </a>
+        </div>
         </aside>
 
         <main class="main-content">
@@ -373,61 +334,56 @@ if ($result_usuarios && $result_usuarios->num_rows > 0) {
             </header>
 
             <section class="content-body">
-                <h2 data-aos="fade-down">¡Buenos días, <?php echo htmlspecialchars($nombre_usuario); ?>!</h2>
+                <h2 data-aos="fade-down">Lista de usuarios</h2>
 
-                <div class="stats-cards">
-                    <div class="card" data-aos="fade-up" data-aos-delay="100">
-                        <h3>Nuevos clientes</h3>
-                        <p>300</p>
-                        <span>+18.33%</span>
-                    </div>
-                    <div class="card" data-aos="fade-up" data-aos-delay="200">
-                        <h3>Ganancias</h3>
-                        <p>$18,306</p>
-                        <span>+ info</span>
-                    </div>
-                    <div class="card" data-aos="fade-up" data-aos-delay="300">
-                        <h3>Soportes</h3>
-                        <p>1538</p>
-                        <span>-1.33%</span>
-                    </div>
-                    <div class="card" data-aos="fade-up" data-aos-delay="400">
-                        <h3>Proyectos</h3>
-                        <p>864</p>
-                        <span>+ info</span>
-                    </div>
-                </div>
+                <?php
+                require_once 'db-connect.php';
 
-                <div class="chart-cards">
-                    <div class="card-large">
-                        <h3>Últimos Usuarios Registrados</h3>
+                $sql = "SELECT id, nombre, apellidos, correo, cedula, genero, fecha_registro FROM usuarios ORDER BY fecha_registro DESC";
 
-                        <div class="latest-users-list">
-                            <?php if (empty($ultimos_usuarios)): ?>
-                                <p class="no-users">No hay usuarios registrados.</p>
+                $result = $conn->query($sql);
+                $usuarios = [];
+
+                if ($result->num_rows > 0) {
+                    $usuarios = $result->fetch_all(MYSQLI_ASSOC);
+                }
+                $conn->close();
+
+                ?>
+
+                <div class="user-table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Apellidos</th>
+                                <th>Correo Electrónico</th>
+                                <th>Cédula</th>
+                                <th>Género</th>
+                                <th>Fecha de Registro</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php if (empty($usuarios)): ?>
+                                <tr>
+                                    <td colspan="6">No hay usuarios registrados.</td>
+                                </tr>
                             <?php else: ?>
-                                <?php foreach ($ultimos_usuarios as $usuario): ?>
-                                    <div class="user-item">
-                                        <i class="fas fa-user-circle user-icon-small"></i>
-                                        <div class="user-details">
-                                            <strong><?php echo htmlspecialchars($usuario['nombre'] . ' ' . $usuario['apellidos']); ?></strong>
-                                            <span><?php echo htmlspecialchars($usuario['correo']); ?></span>
-                                        </div>
-                                    </div>
+                                <?php foreach ($usuarios as $usuario): ?>
+                                    <tr>
+                                        <td><?php echo htmlspecialchars($usuario['nombre']); ?></td>
+                                        <td><?php echo htmlspecialchars($usuario['apellidos']); ?></td>
+                                        <td><?php echo htmlspecialchars($usuario['correo']); ?></td>
+                                        <td><?php echo htmlspecialchars($usuario['cedula']); ?></td>
+                                        <td><?php echo htmlspecialchars($usuario['genero']); ?></td>
+                                        <td><?php echo date('d/m/Y H:i', strtotime($usuario['fecha_registro'])); ?></td>
+                                    </tr>
                                 <?php endforeach; ?>
                             <?php endif; ?>
-                        </div>
+                        </tbody>
+                    </table>
+                </div>
 
-                        <a href="usuarios.php" class="card-footer-link">Ver todos los usuarios &rarr;</a>
-                    </div>
-
-                    <div class="card-large" data-aos="zoom-in" data-aos-delay="600">
-                        <h3>Tu Ubicación Actual</h3>
-                    
-                        <div class="map-container">    
-                            <div id="map"></div> 
-                        </div>
-                    </div>
             </section>
         </main>
     </div>
@@ -436,64 +392,7 @@ if ($result_usuarios && $result_usuarios->num_rows > 0) {
 
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-
-    <script>
-
-    AOS.init({
-        duration: 800,
-        once: true
-    });
-
-    window.addEventListener('load', function() {
-        setTimeout(initMap, 100);
-    });
-
-    function initMap() {
-        if (!document.getElementById('map')) {
-            return;
-        }
-
-        const defaultLat = -3.6833;
-        const defaultLon = -79.6833;
-
-        const map = L.map('map').setView([defaultLat, defaultLon], 13);
-
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-            maxZoom: 19
-        }).addTo(map);
-
-        setTimeout(function() {
-            map.invalidateSize();
-        }, 200);
-
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                function(position) {
-                    const lat = position.coords.latitude;
-                    const lon = position.coords.longitude;
-                    map.setView([lat, lon], 15);
-                    L.marker([lat, lon]).addTo(map)
-                        .bindPopup('<b>¡Estás aquí!</b>')
-                        .openPopup();
-                    map.invalidateSize();
-                },
-                function(error) {
-                    console.log('Error obteniendo ubicación:', error);
-                    L.marker([defaultLat, defaultLon]).addTo(map)
-                        .bindPopup('<b>Piñas, El Oro</b>')
-                        .openPopup();
-                },
-                { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
-            );
-        } else {
-            L.marker([defaultLat, defaultLon]).addTo(map)
-                .bindPopup('<b>Piñas, El Oro</b>')
-                .openPopup();
-        }
-    }
-</script>
+    <script src="js/main.js"></script>
 
 </body>
 </html>
